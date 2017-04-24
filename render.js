@@ -7,34 +7,48 @@ let process = require('process');
 let katex = require('katex');
 let md = require('simple-markdown');
 
-function exitWithUsage() {
-  let argv0 = process.argv.length >= 2 ? path.basename(process.argv[1]) : process.argv0;
-  console.log('usage: ' + argv0 + ' INPUT [OUTPUT]');
-  process.exit(1)
-}
+let { scanArguments, argv0 } = require('./args');
 
-function obtainArguments() {
-  let input, output;
-  let argc = process.argv.length;
-  if (argc >= 5 || argc <= 2) {
+function exitWithUsage(err) {
+  console.log('usage: ' + argv0 + ' [-v|--verbose] INPUT [OUTPUT]');
+  if (err !== undefined) {
+    console.log();
+    console.log(err);
+    process.exit(1);
+  } else {
+    process.exit();
+  }
+}
+function foldOptions(opts, token) {
+  if (/^v(erbose)?/.test(token)) {
+    opts.verbose = true;    
+  } else if (/^h(elp)?/.test(token)) {
     exitWithUsage();
   } else {
-    input = process.argv[2];
-    output = argc === 4 ? process.argv[3] : '';
-  } 
-  if (/^(-|--)(h|he|hel|help)/.test(input)) {
-    exitWithUsage();
+    throw SyntaxError("unexpected option '"+token+"'.");
   }
-  input = path.resolve(input);
-  if (output === '') {
-    let { dir, name } = path.parse(input);
-    output = path.format({ dir, name, ext: '.html' });
-  } else {
-    output = path.resolve(output);
-  }
-  return { input, output }
+  return opts;
 }
-
+function foldArguments(args, token) {
+  args._idx = args._idx + 1 || 0;
+  switch (args._idx) {
+    case 0: args.input = path.resolve(token); break;
+    case 1: args.output = path.resolve(token); break;
+    default: throw SyntaxError("unexpected argument '"+token+"'."); 
+  }
+  return args;
+}
+function readInput(defaults) {
+  try {
+    return scanArguments(process.argv, defaults, foldOptions, foldArguments);
+  } catch (err) {
+    if (err instanceof SyntaxError) {
+      exitWithUsage(err);
+    } else {
+      throw err;
+    }
+  }
+}
 function transform(raw) {
   let rules = Object.assign({}, md.defaultRules);
   rules.codeBlock.html = (node, output, state) => 
@@ -46,7 +60,20 @@ function transform(raw) {
   return printer(parser(raw));
 }
 
-let { input, output } = obtainArguments();
+let defaults = [{ verbose: false }, { input: undefined, output: '' }]
+let [{ verbose }, { input, output }] = readInput(defaults);
+
+if (output === '') {
+  const { dir, name } = path.parse(input);
+  output = path.format({ dir, name, ext: '.html' });
+}
+
+if (verbose) {
+  console.log('verbose: ' + verbose);
+  console.log('input: ' + input);
+  console.log('output: ' + output);
+}
+
 let raw = fs.readFileSync(input) + '\n\n'; // recommended by simple-markdown docs
 let result = transform(raw);
 fs.writeFileSync(output, result);
