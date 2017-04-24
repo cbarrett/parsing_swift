@@ -7,7 +7,9 @@ let process = require('process');
 let katex = require('katex');
 let md = require('simple-markdown');
 
-let { scanArguments, argv0 } = require('./args');
+let args = require('./args');
+
+const argv0 = process.argv.length >= 2 ? path.basename(process.argv[1]) : process.argv0;
 
 function exitWithUsage(err) {
   console.log('usage: ' + argv0 + ' [-v|--verbose] INPUT [OUTPUT]');
@@ -38,9 +40,16 @@ function foldArguments(args, token) {
   }
   return args;
 }
-function readInput(defaults) {
+function readInput(argv, defaults) {
   try {
-    return scanArguments(process.argv, defaults, foldOptions, foldArguments);
+    const tokens = argv.filter((_, idx) => idx >= 2);
+    const result = args.parse(args.lex(tokens), defaults, foldOptions, foldArguments);
+    for (name in init ? defaults.map(Object.keys).concat() : []) {
+      if (result[name] === undefined) {
+        throw SyntaxError("expected value for '"+name+"'.");
+      }
+    } 
+    return result;
   } catch (err) {
     if (err instanceof SyntaxError) {
       exitWithUsage(err);
@@ -49,31 +58,22 @@ function readInput(defaults) {
     }
   }
 }
-function transform(raw) {
-  let rules = Object.assign({}, md.defaultRules);
-  rules.codeBlock.html = (node, output, state) => 
-    (katex.renderToString(node.content, { displayMode: true }));
-  rules.inlineCode.html = (node, output, state) => 
-    (katex.renderToString(node.content, { displayMode: false }));
-  let parser = md.parserFor(rules);
-  let printer = md.htmlFor(md.ruleOutput(rules, 'html'));
-  return printer(parser(raw));
-}
 
 let defaults = [{ verbose: false }, { input: undefined, output: '' }]
-let [{ verbose }, { input, output }] = readInput(defaults);
+let [{ verbose }, { input, output }] = readInput(process.argv, defaults);
 
 if (output === '') {
   const { dir, name } = path.parse(input);
   output = path.format({ dir, name, ext: '.html' });
 }
 
-if (verbose) {
-  console.log('verbose: ' + verbose);
-  console.log('input: ' + input);
-  console.log('output: ' + output);
-}
+let rules = Object.assign({}, md.defaultRules);
+rules.codeBlock.html = (node, output, state) => 
+(katex.renderToString(node.content, { displayMode: true }));
+rules.inlineCode.html = (node, output, state) => 
+(katex.renderToString(node.content, { displayMode: false }));
+let parser = md.parserFor(rules);
+let printer = md.htmlFor(md.ruleOutput(rules, 'html'));
 
 let raw = fs.readFileSync(input) + '\n\n'; // recommended by simple-markdown docs
-let result = transform(raw);
-fs.writeFileSync(output, result);
+fs.writeFileSync(output, printer(parser(raw)));
