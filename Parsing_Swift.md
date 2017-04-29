@@ -95,17 +95,17 @@ The grammar has terminal symbols *T* = {`"-"`, `"0"`, `"1"`}, nonterminal symbol
 ## 2.2 Derivation
 
 The grammar rule <code>T = "0" | "1"</code> above says that we may derive either the string `"0"` or the string `"1"` from the nonterminal `T`, by replacing or substituting either "0" or "1" for `T`.
-These <dfn>derivations</dfn> are written `T` &rArr; `"0"` and `T` &rArr; `"1"`.
+These <dfn>derivations</dfn> are written `T \Longrightarrow "0"` and `T \Longrightarrow "1"`.
 
 Similarly, from nonterminal `E` we can derive `T`, for instance.
-From `T` we could derive `"0"`, for example, which shows that from `E` we can derive `"0"`, written `E` &rArr; `"0"`.
+From `T` we could derive `"0"`, for example, which shows that from `E` we can derive `"0"`, written `E \Longrightarrow "0"`.
 
 Choosing the other alternative for `E` we might get the derivation
 
-    E &rArr; T "-" E
-      &rArr; "0" "-" E
-      &rArr; "0" "-" T
-      &rArr; "0" "-" "1"
+    E \Longrightarrow T "-" E
+      \Longrightarrow "0" "-" E
+      \Longrightarrow "0" "-" T
+      \Longrightarrow "0" "-" "1"
 
 In each step of a derivation we replace a nonterminal with one of the alternatives on the right hand side of its rule.
 A derivation can be shown as a tree; see Figure 2.
