@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Parsing and Grammars with Swift</title>
+<link rel="stylesheet" href="katex.min.css" />
+</head>
+<body>
 <article>
 # 1. Grammars and Parsing
 
@@ -124,3 +132,5 @@ Let *T*<sup>\*</sup> be the set of all strings of symbols from *T*, including th
 When `A` is a nonterminal, the set of all strings derivable from `A` is called *L*(`A`):
 
 </article>
+</body>
+</html>
