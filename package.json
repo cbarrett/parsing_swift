@@ -1,4 +1,5 @@
 {
+  "private": true,
   "dependencies": {
     "katex": "^0.7.1",
     "simple-markdown": "^0.2.1"
