@@ -7,6 +7,7 @@
 </head>
 <body>
 <article>
+
 # 1. Grammars and Parsing
 
 Often the input to a program is given as a text, but internally in the program it is better represented more abstractly: by a Swift value, for instance.
@@ -19,16 +20,20 @@ It must check that the parentheses match, it should allow any number of blanks a
 Doing this without a systematic approach is very hard.
 
 <aside>
+
 # Example 1
+
 This text file describes the probable states of a slightly defective gas gauge in a car, given the state of the car's battery and its gas tank:
 
+<pre>
     probability(GasGauge | BatteryPower, Gas)
     {
         (0, 0): 100.0,  0.0;
         (0, 1): 100.0,  0.0;
         (1, 0): 100.0,  0.0;
         (1, 1):   0.1, 99.9;
-    }
+    } 
+</pre>
 
 These lecture notes explain how to create programs that can read an input text file such as the above, check that its format is correct, and build an internal representation (an array or a list) of the data in the input file.
 Here we shall not be concerned with the meaning[^3] of these data.
@@ -61,6 +66,7 @@ At the end of the chapter, we apply the techniques to parse and evaluate more re
 When reading this chapter, keep in mind that although it may look 'theoretical' at places, the goal is to provide a *practically* useful tool.
 
 # 2 Grammars
+
 ## 2.1 Grammar notation
 
 A <dfn>grammar</dfn> *G* is a set of rules for combining symbols to a well-formed text.
@@ -92,6 +98,7 @@ A <dfn>sequence</dfn> has form <code>e<sub>1</sub> ... e<sub>*m*</sub></code>, w
 <aside>
 
 # Example 2
+
 Simple arithmetic expressions of arbitrary length built from the subtraction operator ‘`-`’ and the numerals `0` and `1` can be described by the following grammar:
 
     E = T "-" E | T .
