@@ -18,9 +18,9 @@ if (output === '') {
 
 let rules = Object.assign({}, md.defaultRules);
 rules.codeBlock.html = (node, output, state) => 
-(katex.renderToString(node.content, { displayMode: true }));
+    (katex.renderToString(node.content, { displayMode: true }));
 rules.inlineCode.html = (node, output, state) => 
-(katex.renderToString(node.content, { displayMode: false }));
+    (katex.renderToString(node.content, { displayMode: false }));
 let parser = md.parserFor(rules);
 let printer = md.htmlFor(md.ruleOutput(rules, 'html'));
 
