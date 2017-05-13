@@ -26,23 +26,23 @@ Doing this without a systematic approach is very hard.
 This text file describes the probable states of a slightly defective gas gauge in a car, given the state of the car's battery and its gas tank:
 
 <pre>
-    probability(GasGauge | BatteryPower, Gas)
-    {
-        (0, 0): 100.0,  0.0;
-        (0, 1): 100.0,  0.0;
-        (1, 0): 100.0,  0.0;
-        (1, 1):   0.1, 99.9;
-    } 
+probability(GasGauge | BatteryPower, Gas)
+{
+    (0, 0): 100.0,  0.0;
+    (0, 1): 100.0,  0.0;
+    (1, 0): 100.0,  0.0;
+    (1, 1):   0.1, 99.9;
+} 
 </pre>
 
 These lecture notes explain how to create programs that can read an input text file such as the above, check that its format is correct, and build an internal representation (an array or a list) of the data in the input file.
 Here we shall not be concerned with the meaning[^3] of these data.
+
 </aside>
 
-[^3]:
-The lines (0, 0) and (0, 1) say that if the battery is completely uncharged (0) and the tank is empty (0) or non-empty (1), then the meter will indicate Empty with probability 100%.
-The line (1, 0) says that if the battery is charged (1) and the tank is empty (0), then the gas gauge will indicate Empty with probability 100% also.
-Finally, the line (1, 1) says that even when the battery is charged (1) and the tank is non-empty (1), the gas gauge will (erroneously) indicate Empty with probability 0.1% and Nonempty with probability 99.9%.
+[^3]: The lines `\mathtt(0, 0)` and `\mathtt(0, 1)` say that if the battery is completely uncharged (0) and the tank is empty (0) or non-empty (1), then the meter will indicate Empty with probability 100%.
+    The line `\mathtt(1, 0)` says that if the battery is charged (1) and the tank is empty (0), then the gas gauge will indicate Empty with probability 100% also.
+    Finally, the line `\mathtt(1, 1)` says that even when the battery is charged (1) and the tank is non-empty (1), the gas gauge will (erroneously) indicate Empty with probability 0.1% and Nonempty with probability 99.9%.
 
 This chapter provides simple tools to perform these tasks:
 
@@ -52,7 +52,7 @@ it to internal form.
 
 The input descriptions are called grammars, and the programs for reading input are called parsers.
 We explain grammars and the construction of parsers in Swift.
-The methods shown here are essentially independent of Swift, and can be applied also to imperative languages with recursive procedures (Ada, C, Modula, Pascal, etc.)
+The methods shown here are essentially independent of Swift, and can be applied also to imperative languages with recursive procedures (Ada, C, Modula, Pascal, Standard ML, etc.)
 
 The order of presentation is as follows.
 First we introduce grammars, then we explain parsing, formulate some requirements on grammars, and show how to construct a parser skeleton from a grammar which satisfies the requirements.
@@ -74,25 +74,28 @@ The symbols that can appear in a text are called <dfn>terminal symbols</dfn>.
 The combinations of terminal symbols are described using <dfn>grammar rules</dfn> and <dfn>nonterminal symbols</dfn>.
 Nonterminal symbols cannot appear in the final texts; their only role is to help generating texts: strings of terminal symbols.
 
-A <dfn>grammar rule</dfn> has the form <code>A = f<sub>1</sub> | ... | f<sub>*n*</sub></code> where the `A` on the left hand side is the nonterminal symbol defined by the rule, and the <code>f<sub>*i*</sub></code> on the right hand side show the legal ways of deriving a text from the nonterminal `A`.
+A <dfn>grammar rule</dfn> has the form `\mathtt{A} = \mathtt{f}_1 | \ldots | \mathtt{f}_n` where the `\mathtt A` on the left hand side is the nonterminal symbol defined by the rule, and the `\mathtt{f}_i` on the right hand side show the legal ways of deriving a text from the nonterminal `\mathtt A`.
 
-Each <dfn>alternative</dfn> `f` is a <dfn>sequence</dfn> <code>e<sub>1</sub> ... e<sub>*m*</sub></code> of symbols.
-We write &Lambda; for the empty sequence (that is, when *m* = 0).
+Each <dfn>alternative</dfn> `\mathtt f` is a <dfn>sequence</dfn> `\mathtt{e}_1 \ldots \mathtt{e}_m` of symbols.
+We write `\Lambda` for the empty sequence (that is, when `m = 0`).
 
-A <dfn>symbol</dfn> is either a nonterminal symbol `A` defined by some grammar rule, or a <dfn>terminal symbol</dfn> `"c"` which stands for `c`. 
+A <dfn>symbol</dfn> is either a nonterminal symbol `\mathtt A` defined by some grammar rule, or a <dfn>terminal symbol</dfn> `\mathtt{"c"}` which stands for 'c'. 
 
-The <dfn>starting symbol</dfn> `S` is one of the nonterminal symbols.
+The <dfn>starting symbol</dfn> `\mathtt S` is one of the nonterminal symbols.
 The well-formed texts are precisely those derivable from the starting symbols.
 
 The grammar notation is summarized in Figure 1.
 
 <figure>
-A <dfn>grammar</dfn> *G* = (*T*, *N*, *R*, *S*) has a set *T* of terminals, a set *N* of nonterminals, a set *R* of rules, and a starting symbol `S` &isin; *N*.
 
-A <dfn>rule</dfn> has form <code>A = f<sub>1</sub> | ... | f<sub>*n*</sub></code> where `A` &isin; *N* is a nonterminal, each alternative <code>f<sub>*i*</sub></code> is a sequence, and *n* &ge; 1.
+A <dfn>grammar</dfn> `G = (T, N, R, \mathtt S)` has a set `T` of terminals, a set `N` of nonterminals, a set `R` of rules, and a starting symbol `\mathtt S \in N`.
 
-A <dfn>sequence</dfn> has form <code>e<sub>1</sub> ... e<sub>*m*</sub></code>, where each <code>e<sub>*j*</sub></code> is a symbol in *T* &cup; *N*, and *m* &ge; 0. When *m* = 0, the sequence is empty and is written &Lambda;.
+A <dfn>rule</dfn> has form `\mathtt{A} = \mathtt{f}_1 | \ldots | \mathtt{f}_n` where `\mathtt{A} \in N` is a nonterminal, each alternative `f_i` is a sequence, and `n \ge 1`.
+
+A <dfn>sequence</dfn> has form `\mathtt{e}_1 \ldots \mathtt{e}_m`, where each `\mathtt{e}_j` is a symbol in `T \subset N`, and `m \ge 0`. When `m = 0`, the sequence is empty and is written `\Lambda`.
+
 <figcaption>Figure 1: Grammar notation</figcaption>
+
 </figure>
 
 <aside>
@@ -101,10 +104,13 @@ A <dfn>sequence</dfn> has form <code>e<sub>1</sub> ... e<sub>*m*</sub></code>, w
 
 Simple arithmetic expressions of arbitrary length built from the subtraction operator ‘`-`’ and the numerals `0` and `1` can be described by the following grammar:
 
-    E = T "-" E | T .
-    T = "0" | "1" .
+<pre>
+E = T "-" E | T .
+T = "0" | "1" .
+</pre>
 
 The grammar has terminal symbols *T* = {`"-"`, `"0"`, `"1"`}, nonterminal symbols *N* = {`E`, `T`}, two rules in *R* with two alternatives each, and starting symbol `E`. Usually the starting symbol is listed first.
+
 </aside>
 
 ## 2.2 Derivation
