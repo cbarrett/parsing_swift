@@ -7,7 +7,7 @@ SHELL := bash
 
 OUTPUT ?= dist
 
-sources := $(wildcard *.md)
+sources := $(filter-out README.md,$(wildcard *.md))
 pages := $(patsubst %.md,$(OUTPUT)/%.html,$(sources))
 statics := copy.katex copy.reset copy.local
 copy.katex.src := node_modules/katex/dist
