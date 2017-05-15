@@ -9,11 +9,13 @@ OUTPUT ?= dist
 
 sources := $(wildcard *.md)
 pages := $(patsubst %.md,$(OUTPUT)/%.html,$(sources))
-statics := copy.katex copy.reset
+statics := copy.katex copy.reset copy.local
 copy.katex.src := node_modules/katex/dist
 copy.katex.files := katex.min.css fonts/
 copy.reset.src := node_modules/reset-css
 copy.reset.files := reset.css
+copy.local.src := .
+copy.local.files := style.css
 
 FORCE:
 
