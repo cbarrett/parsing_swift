@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>Parsing and Grammars with Swift</title>
+<title>Parsing and Grammars with Swift - Grammars and Parsing</title>
+<link rel="stylesheet" href="reset.css" />
 <link rel="stylesheet" href="katex.min.css" />
 </head>
 <body>

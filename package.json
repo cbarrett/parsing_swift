@@ -2,6 +2,7 @@
   "private": true,
   "dependencies": {
     "katex": "^0.7.1",
+    "reset-css": "^2.2.0",
     "simple-markdown": "^0.2.1"
   }
 }
