@@ -68,10 +68,12 @@ From `T` we could derive `"0"`, for example, which shows that from `E` we can de
 
 Choosing the other alternative for `E` we might get the derivation
 
-    E \Longrightarrow T "-" E
-      \Longrightarrow "0" "-" E
-      \Longrightarrow "0" "-" T
-      \Longrightarrow "0" "-" "1"
+    \begin{aligned}
+    \mathtt E &\mathrel{\Longrightarrow} \mathtt T \enspace \texttt{"-"} \enspace \mathtt E \\
+      &\mathrel{\Longrightarrow} \texttt{"0"} \enspace \texttt{"-"} \enspace \mathtt E \\
+      &\mathrel{\Longrightarrow} \texttt{"0"} \enspace \texttt{"-"} \enspace \mathtt{T} \\
+      &\mathrel{\Longrightarrow} \texttt{"0"} \enspace \texttt{"-"} \enspace \texttt{"1"}
+    \end{aligned}
 
 In each step of a derivation we replace a nonterminal with one of the alternatives on the right hand side of its rule.
 A derivation can be shown as a tree; see Figure 2.
